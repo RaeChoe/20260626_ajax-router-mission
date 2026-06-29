@@ -1,28 +1,38 @@
-import { useParams, useNavigate, Link } from "react-router";
+import { Link, useParams, useNavigate } from "react-router";
 
 export default function PostDetail({ posts, onDelete }) {
-  let { id } = useParams();
-  console.log(id);
-  const detail = posts.find(p => p.id === Number(id));
+  const { id } = useParams();
   let navigate = useNavigate();
+  console.log(id);
+  const post = posts.find(p => p.id === Number(id));
+
+  if (!post) {
+    return (
+      <>
+        <h2>에러</h2>
+        <p>존재하지 않는 게시물 입니다.</p>
+        <Link to="/">홈으로 이동</Link>
+      </>
+    );
+  }
+
+  const handleDelete = () => {
+    if (window.confirm("정말 삭제할까요?")) {
+      onDelete(post.id);
+      navigate("/posts");
+    }
+  };
 
   return (
-    <div>
-      <h2>글 상세 페이지</h2>
-      <h3>{detail.title}</h3>
-      <p>{detail.content}</p>
-      <p>{detail.createdAt}</p>
+    <>
+      <h2>{post.title}</h2>
+      <small>{post.createdAt}</small>
+      <p>{post.content}</p>
 
-      <Link to={`/posts/${detail.id}/edit`}>
-        <button>수정</button>
-      </Link>
-      <button
-        onClick={() => {
-          onDelete(detail.id);
-        }}
-      >
-        삭제
-      </button>
-    </div>
+      <div className="controls">
+        <Link to={`/posts/edit/${post.id}`}>수정하기</Link>
+        <button onClick={handleDelete}>삭제하기</button>
+      </div>
+    </>
   );
 }

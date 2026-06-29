@@ -1,41 +1,68 @@
-import { useState } from "react";
-import { useParams } from "react-router";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router";
+import styles from "./PostNew.module.css";
 
-export default function PostEdit({ posts, onEdit }) {
+export default function PostEdit({ posts, onUpdate }) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
   const { id } = useParams();
+  let navigate = useNavigate();
 
-  const detail = posts.find(p => p.id === Number(id));
+  const post = posts.find(p => p.id === Number(id));
 
-  const [title, setTitle] = useState(detail ? detail.title : "");
-  const [content, setContent] = useState(detail ? detail.content : "");
+  useEffect(() => {
+    if (!post) return;
+    // eslint-disable-next-line
+    setTitle(post.title);
+    setContent(post.content);
+  }, [post]);
+
+  if (!post) {
+    return (
+      <>
+        <h2>에러</h2>
+        <p>존재하지 않는 게시물 입니다.</p>
+        <Link to="/">홈으로 이동</Link>
+      </>
+    );
+  }
 
   const handleSubmit = e => {
     e.preventDefault();
-
-    onEdit({
-      ...detail,
-      title,
-      content,
+    const trimmedTitle = title.trim();
+    const trimmedContent = content.trim();
+    if (!trimmedTitle || !trimmedContent) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+    onUpdate(Number(id), {
+      title: title,
+      content: content,
     });
+
+    navigate(`/posts/${id}`);
   };
 
   return (
-    <div>
-      <h2>글 수정 페이지</h2>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>제목</label>
-          <input type="text" value={title} onChange={e => setTitle(e.target.value)} />
-        </div>
-
-        <div>
-          <label>내용</label>
-          <textarea value={content} onChange={e => setContent(e.target.value)}></textarea>
-        </div>
-
-        <button type="submit">수정 완료</button>
+    <>
+      <h2>글 수정</h2>
+      <form action="" className={styles.form} onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="제목"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+        />
+        <textarea
+          name=""
+          id=""
+          placeholder="내용"
+          value={content}
+          onChange={e => setContent(e.target.value)}
+        ></textarea>
+        <button>등록</button>
       </form>
-    </div>
+    </>
   );
 }
