@@ -21,7 +21,7 @@ function App() {
     async function fetchData() {
       try {
         // 절대경로로 적어야 어느 페이지에서도 로드시 안전
-        const res = await fetch(`${import.meta.env.Base_URL}/data/blog.json`, {
+        const res = await fetch(`${import.meta.env.BASE_URL}/data/blog.json`, {
           signal: controller.signal,
         });
         // !res.ok : res.ok === false
